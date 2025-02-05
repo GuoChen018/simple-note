@@ -9,14 +9,10 @@ import { useDebounce } from '@/hooks/useDebounce';
 import { notesService, type Note } from '@/services/notes';
 import { useNotes } from '@/context/NotesContext';
 import Toast from 'react-native-toast-message';
-import Editor from "@/components/dom-component/rich-text";
 import { LexicalComposer } from "@lexical/react/LexicalComposer";
 import ExampleTheme from "@/components/dom-component/ExampleTheme";
 import { ListNode, ListItemNode } from "@lexical/list";
-import { DefaultToolbar } from "@/components/dom-component/plugins/toolbars/DefaultToolbar";
 import { LexicalEditor } from "lexical";
-
-const IS_DOM = typeof Editor !== "undefined";
 
 export default function NotePage() {
   const { id } = useLocalSearchParams<{ id: string }>();
@@ -119,18 +115,6 @@ export default function NotePage() {
         placeholder="Start typing..."
         placeholderTextColor={colors.textSecondary}
       />
-      <KeyboardAvoidingView
-        style={{ flex: 1 }}
-        behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
-      >
-        <View style={{ flex: 1 }}>
-          <Editor
-            setPlainText={setPlainText}
-            setEditorState={setEditorState}
-            editorRef={editorRef}
-          />
-        </View>
-      </KeyboardAvoidingView>
     </View>
   );
 } 
