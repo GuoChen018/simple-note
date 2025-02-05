@@ -1,39 +1,84 @@
-import { DarkTheme, DefaultTheme, ThemeProvider } from '@react-navigation/native';
+import { Stack } from "expo-router";
+import { ThemeProvider } from "@/context/ThemeContext";
 import { useFonts } from 'expo-font';
-import { Stack } from 'expo-router';
-import * as SplashScreen from 'expo-splash-screen';
-import { StatusBar } from 'expo-status-bar';
-import { useEffect } from 'react';
-import 'react-native-reanimated';
+import { FONTS } from '@/constants/fonts';
+import { GestureHandlerRootView } from 'react-native-gesture-handler';
+import Toast from 'react-native-toast-message';
+import { toastConfig } from '@/components/Toast';
+import { SQLiteProvider, openDatabaseSync } from 'expo-sqlite';
+import { Suspense, useEffect } from "react";
+import { ActivityIndicator } from "react-native";
+import { useMigrations } from 'drizzle-orm/expo-sqlite/migrator';
+import migrations from '@/drizzle/migrations';
+import { drizzle } from 'drizzle-orm/expo-sqlite';
+import { NotesProvider } from '@/context/NotesContext';
 
-import { useColorScheme } from '@/hooks/useColorScheme';
-
-// Prevent the splash screen from auto-hiding before asset loading is complete.
-SplashScreen.preventAutoHideAsync();
+// Close any existing connections and reopen
+const expo = openDatabaseSync('db.db');
+export const db = drizzle(expo);
 
 export default function RootLayout() {
-  const colorScheme = useColorScheme();
-  const [loaded] = useFonts({
-    SpaceMono: require('../assets/fonts/SpaceMono-Regular.ttf'),
-  });
-
+  const [fontsLoaded] = useFonts(FONTS);
+  
+  // Run migrations
   useEffect(() => {
-    if (loaded) {
-      SplashScreen.hideAsync();
-    }
-  }, [loaded]);
+    const runMigrations = async () => {
+      try {
+        console.log('Starting migrations...');
+        await db.run('PRAGMA foreign_keys = ON;');
+        
+        // Create table if not exists
+        await db.run(`CREATE TABLE IF NOT EXISTS notes (
+          id TEXT PRIMARY KEY NOT NULL,
+          title TEXT,
+          content TEXT,
+          created_at INTEGER NOT NULL,
+          updated_at INTEGER NOT NULL,
+          is_deleted INTEGER DEFAULT 0 NOT NULL,
+          last_synced_at INTEGER,
+          is_dirty INTEGER DEFAULT 1 NOT NULL
+        );`);
 
-  if (!loaded) {
-    return null;
-  }
+        console.log('Migrations completed successfully');
+      } catch (error) {
+        console.error('Migration error:', error);
+      }
+    };
+
+    runMigrations();
+  }, []);
+
+  if (!fontsLoaded) return null;
 
   return (
-    <ThemeProvider value={colorScheme === 'dark' ? DarkTheme : DefaultTheme}>
-      <Stack>
-        <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
-        <Stack.Screen name="+not-found" />
-      </Stack>
-      <StatusBar style="auto" />
-    </ThemeProvider>
+    <Suspense fallback={<LoadingScreen/>}>
+      <SQLiteProvider databaseName="db.db" useSuspense>
+        <GestureHandlerRootView style={{ flex: 1 }}>
+          <ThemeProvider>
+            <NotesProvider>
+              <Stack screenOptions={{ headerShown: false }} />
+              <Toast config={toastConfig} />
+            </NotesProvider>
+          </ThemeProvider>
+        </GestureHandlerRootView>
+      </SQLiteProvider>
+    </Suspense>
   );
 }
+
+function LoadingScreen() {
+  return (
+    <GestureHandlerRootView style={{ flex: 1 }}>
+      <ThemeProvider>
+        <ActivityIndicator 
+          style={{ flex: 1 }}
+          size="large"
+        />
+      </ThemeProvider>
+    </GestureHandlerRootView>
+  );
+}
+
+
+
+

@@ -1,0 +1,9 @@
+import Svg, { Path } from 'react-native-svg';
+
+export function BackIcon({ color = '#A1A1A1', size = 24 }) {
+  return (
+    <Svg width={size} height={size} viewBox="0 0 24 24" fill="none">
+<Path fillRule="evenodd" clipRule="evenodd" d="M20 10.9992L20 12.9992L8 12.9992L8 14.999L6 14.999L6 12.9992L4 12.9992L4 10.9992L6 10.9992L6 8.99922L8 8.99922L8 10.9992L20 10.9992ZM10 16.9988L10 14.9988L8 14.9988L8 16.9988L10 16.9988ZM12 16.9992L12 18.9992L10 18.9992L10 16.9992L12 16.9992ZM10 8.99941L10 6.99941L8 6.99941L8 8.99941L10 8.99941ZM12 4.99902L12 6.99902L10 6.99902L10 4.99902L12 4.99902Z" fill="#121212"/>
+</Svg>
+  );
+}

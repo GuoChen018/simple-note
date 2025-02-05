@@ -1,0 +1,9 @@
+export { SearchIcon } from './SearchIcon';
+export { CloseIcon } from './CloseIcon';
+export { PlusIcon } from './PlusIcon';
+export { BackIcon } from './BackIcon';
+export { DeleteIcon } from './DeleteIcon';
+export { TextStylesIcon } from './TextStylesIcon';
+export { CheckboxIcon } from './CheckboxIcon';
+export { ListIcon } from './ListIcon';
+export { ImageIcon } from './ImageIcon';
