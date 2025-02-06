@@ -10,6 +10,9 @@ import { useDebounce } from '@/hooks/useDebounce';
 import { notesService, type Note } from '@/services/notes';
 import { useNotes } from '@/context/NotesContext';
 import Toast from 'react-native-toast-message';
+import Editor from "@/components/dom-components/hello-dom";
+
+const IS_DOM = typeof Editor !== "undefined";
 
 export default function NotePage() {
   const { id } = useLocalSearchParams<{ id: string }>();
@@ -18,6 +21,9 @@ export default function NotePage() {
   const colors = COLORS[theme];
   const router = useRouter();
   const { notes, updateNoteInState } = useNotes();
+
+  const [editorState, setEditorState] = useState<string | null>(null);
+  const [plainText, setPlainText] = useState("");
   
   const note = notes.find(n => n.id === id);
   const [title, setTitle] = useState(note?.title ?? '');
@@ -97,7 +103,7 @@ export default function NotePage() {
           placeholderTextColor={colors.textSecondary}
         />
       </View>
+      <Editor setPlainText={setPlainText} setEditorState={setEditorState} />
     </>
-    
   );
 } 
