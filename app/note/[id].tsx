@@ -1,3 +1,4 @@
+import React from 'react';
 import { View, TextInput, Pressable, Text, KeyboardAvoidingView, Platform } from 'react-native';
 import { useThemedStyles } from '@/hooks/useThemedStyles';
 import { useTheme } from '@/context/ThemeContext';
@@ -9,10 +10,6 @@ import { useDebounce } from '@/hooks/useDebounce';
 import { notesService, type Note } from '@/services/notes';
 import { useNotes } from '@/context/NotesContext';
 import Toast from 'react-native-toast-message';
-import { LexicalComposer } from "@lexical/react/LexicalComposer";
-import ExampleTheme from "@/components/dom-component/ExampleTheme";
-import { ListNode, ListItemNode } from "@lexical/list";
-import { LexicalEditor } from "lexical";
 
 export default function NotePage() {
   const { id } = useLocalSearchParams<{ id: string }>();
@@ -25,14 +22,6 @@ export default function NotePage() {
   const note = notes.find(n => n.id === id);
   const [title, setTitle] = useState(note?.title ?? '');
   const [content, setContent] = useState(note?.content ?? '');
-  const [editorState, setEditorState] = useState<string | null>(null);
-  const [plainText, setPlainText] = useState("");
-  const editorRef = useRef<LexicalEditor | null>(null);
-
-  useEffect(() => {
-    console.log("Editor Ref Updated in id.tsx:", editorRef.current);
-  }, [editorRef.current]);
-  
 
   const saveNote = useCallback(async () => {
     const updates = {
@@ -76,45 +65,39 @@ export default function NotePage() {
 
   if (!note) return null;
 
-  const toolbarEditorConfig = {
-    namespace: "Toolbar Editor",
-    nodes: [ListNode, ListItemNode],
-    theme: ExampleTheme,
-    onError(error: Error) {
-      throw error;
-    },
-  };
-
   return (
-    <View style={{ flex: 1, backgroundColor: colors.backgroundPrimary }}>
-      <View style={styles.header}>
-        <Pressable onPress={handleBack} style={styles.backButton}>
-          <BackIcon color={colors.textPrimary} />
-        </Pressable>
+    <>
+      <View style={{ flex: 1, backgroundColor: colors.backgroundPrimary }}>
+        <View style={styles.header}>
+          <Pressable onPress={handleBack} style={styles.backButton}>
+            <BackIcon color={colors.textPrimary} />
+          </Pressable>
+        </View>
+        <TextInput
+          style={[styles.titleInput, { color: colors.textPrimary }]}
+          value={title}
+          onChangeText={setTitle}
+          placeholder="Title"
+          placeholderTextColor={colors.textSecondary}
+        />
+        <TextInput
+          style={{
+            flex: 1,
+            padding: 16,
+            fontSize: 16,
+            fontFamily: 'Inter',
+            lineHeight: 24,
+            color: colors.textPrimary,
+            textAlignVertical: 'top'
+          }}
+          multiline
+          value={content}
+          onChangeText={setContent}
+          placeholder="Start typing..."
+          placeholderTextColor={colors.textSecondary}
+        />
       </View>
-      <TextInput
-        style={[styles.titleInput, { color: colors.textPrimary }]}
-        value={title}
-        onChangeText={setTitle}
-        placeholder="Title"
-        placeholderTextColor={colors.textSecondary}
-      />
-      <TextInput
-        style={{
-          flex: 1,
-          padding: 16,
-          fontSize: 16,
-          fontFamily: 'Inter',
-          lineHeight: 24,
-          color: colors.textPrimary,
-          textAlignVertical: 'top'
-        }}
-        multiline
-        value={content}
-        onChangeText={setContent}
-        placeholder="Start typing..."
-        placeholderTextColor={colors.textSecondary}
-      />
-    </View>
+    </>
+    
   );
 } 
