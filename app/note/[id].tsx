@@ -1,3 +1,4 @@
+
 import React from 'react';
 import { View, TextInput, Pressable, Text, KeyboardAvoidingView, Platform } from 'react-native';
 import { useThemedStyles } from '@/hooks/useThemedStyles';
@@ -12,7 +13,16 @@ import { useNotes } from '@/context/NotesContext';
 import Toast from 'react-native-toast-message';
 import Editor from "@/components/dom-components/hello-dom";
 
+// At the top of [id].tsx, right after imports
+console.log('=== [id].tsx: Module loaded ===');
+
+// Modify your IS_DOM check
 const IS_DOM = typeof Editor !== "undefined";
+console.log('=== [id].tsx: Checking IS_DOM ===', { 
+  IS_DOM, 
+  EditorType: typeof Editor,
+  EditorValue: Editor 
+});
 
 export default function NotePage() {
   const { id } = useLocalSearchParams<{ id: string }>();
@@ -23,7 +33,7 @@ export default function NotePage() {
   const { notes, updateNoteInState } = useNotes();
 
   const [editorState, setEditorState] = useState<string | null>(null);
-  const [plainText, setPlainText] = useState("");
+  const [plainText, setPlainText] = useState('');
   
   const note = notes.find(n => n.id === id);
   const [title, setTitle] = useState(note?.title ?? '');
@@ -69,7 +79,15 @@ export default function NotePage() {
     }
   };
 
-  if (!note) return null;
+  console.log('NotePage: Before note check', { noteExists: !!note });
+  if (!note) {
+    console.log('NotePage: Note not found, returning null');
+    return null;
+  }
+  console.log('NotePage: Note found, continuing');
+  
+  console.log('NotePage: IS_DOM =', IS_DOM);
+  console.log('NotePage: Editor type =', typeof Editor);
 
   return (
     <>
@@ -103,6 +121,7 @@ export default function NotePage() {
           placeholderTextColor={colors.textSecondary}
         />
       </View>
+      {(() => { console.log('About to go to Editor'); return null; })()}
       <Editor setPlainText={setPlainText} setEditorState={setEditorState} />
     </>
   );
