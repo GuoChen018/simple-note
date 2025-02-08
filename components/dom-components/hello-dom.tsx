@@ -1,64 +1,74 @@
-  "use dom";
-  console.log('=== hello-dom.tsx: Module loaded ===');
+"use dom";
+console.log('=== hello-dom.tsx: Module loaded ===');
 
-  import "./styles.css";
+import "./styles.css";
 
-  import { AutoFocusPlugin } from "@lexical/react/LexicalAutoFocusPlugin";
-  import { LexicalComposer } from "@lexical/react/LexicalComposer";
-  import { ContentEditable } from "@lexical/react/LexicalContentEditable";
-  import { LexicalErrorBoundary } from "@lexical/react/LexicalErrorBoundary";
-  import { HistoryPlugin } from "@lexical/react/LexicalHistoryPlugin";
-  import { RichTextPlugin } from "@lexical/react/LexicalRichTextPlugin";
-  import { OnChangePlugin } from "@lexical/react/LexicalOnChangePlugin";
-  import React, { useEffect } from "react";
-  import { useLexicalComposerContext } from '@lexical/react/LexicalComposerContext';
+import { AutoFocusPlugin } from "@lexical/react/LexicalAutoFocusPlugin";
+import { LexicalComposer } from "@lexical/react/LexicalComposer";
+import { ContentEditable } from "@lexical/react/LexicalContentEditable";
+import { LexicalErrorBoundary } from "@lexical/react/LexicalErrorBoundary";
+import { HistoryPlugin } from "@lexical/react/LexicalHistoryPlugin";
+import { RichTextPlugin } from "@lexical/react/LexicalRichTextPlugin";
+import { OnChangePlugin } from "@lexical/react/LexicalOnChangePlugin";
 
-  import ExampleTheme from "./ExampleTheme";
-  import ToolbarPlugin from "./plugins/ToolbarPlugin";
-  import TreeViewPlugin from "./plugins/TreeViewPlugin";
-  import { $getRoot, EditorState, LexicalEditor, ParagraphNode, TextNode } from "lexical";
+import ExampleTheme from "./ExampleTheme";
+import ToolbarPlugin from "./plugins/ToolbarPlugin";
+import TreeViewPlugin from "./plugins/TreeViewPlugin";
+import { $getRoot, EditorState, LexicalEditor } from "lexical";
 
-  const placeholder = "Enter some rich text...";
+const placeholder = "Enter some rich text...";
 
-  console.log("Hello from editor file");
+interface DOMConfig {
+  // style: {
+  //   width?: string | number;
+  //   height?: string | number;
+  // };
+  matchContents: boolean;
+}
 
-  export default function Editor({
-    setPlainText,
-    setEditorState,
-  }: {
-    setPlainText: React.Dispatch<React.SetStateAction<string>>;
-    setEditorState: React.Dispatch<React.SetStateAction<string | null>>;
-  }) {
-    const editorConfig = {
-      namespace: "React.js Demo",
-      nodes: [TextNode, ParagraphNode],
-      onError(error: Error) {
-        console.error("Editor Error:", error);
-      },
-      theme: ExampleTheme,
-    };
+interface EditorProps {
+  setPlainText: React.Dispatch<React.SetStateAction<string>>;
+  setEditorState: React.Dispatch<React.SetStateAction<string | null>>;
+  dom: DOMConfig;
+}
 
-    const onChange = (editorState: EditorState) => {
-      editorState.read(() => {
-        const root = $getRoot();
-        const plainText = root.getTextContent();
-        setPlainText(plainText);
-        setEditorState(JSON.stringify(editorState));
-      });
-    };
+export default function Editor({
+  setPlainText,
+  setEditorState,
+  dom
+}: EditorProps) {
 
-    console.log("Editor: Starting render");
+  const editorConfig = {
+    namespace: "React.js Demo",
+    nodes: [],
+    onError(error: Error) {
+      console.error("Editor Error:", error);
+    },
+    theme: ExampleTheme,
+    editorState: undefined,
+    dom
+  };
+  
+  return (
+    <div>
+      <div>testing</div>
+      <LexicalComposer initialConfig={editorConfig}>
+        {(() => { console.log('In Lexical Composer'); return null; })()}
+        <ToolbarPlugin /> 
+        <RichTextPlugin
+            contentEditable={
+            <ContentEditable
+              className="editor-input"
+              aria-placeholder={placeholder}
+              placeholder={
+                <div className="editor-placeholder">{placeholder}</div>
+              }
+            />
+          }
+          ErrorBoundary={LexicalErrorBoundary}
+        />
+      </LexicalComposer>
+    </div>
     
-    return (
-    <LexicalComposer initialConfig={editorConfig}>
-      <RichTextPlugin
-        contentEditable={<ContentEditable />}
-        placeholder={<div>Enter some text...</div>}
-        ErrorBoundary={LexicalErrorBoundary}
-      />
-      <OnChangePlugin onChange={onChange} />
-      <HistoryPlugin />
-      <AutoFocusPlugin />
-    </LexicalComposer>
   );
-  }
+}

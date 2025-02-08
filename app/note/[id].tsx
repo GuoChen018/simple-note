@@ -11,7 +11,11 @@ import { useDebounce } from '@/hooks/useDebounce';
 import { notesService, type Note } from '@/services/notes';
 import { useNotes } from '@/context/NotesContext';
 import Toast from 'react-native-toast-message';
-import Editor from "@/components/dom-components/hello-dom";
+console.log('=== [id].tsx: Before Editor import ===');
+import Editor from "../../components/dom-components/hello-dom"; 
+import DOMComponent from '@/components/my-component';
+
+console.log('=== [id].tsx: After Editor import ===', { Editor });
 
 // At the top of [id].tsx, right after imports
 console.log('=== [id].tsx: Module loaded ===');
@@ -122,7 +126,15 @@ export default function NotePage() {
         />
       </View>
       {(() => { console.log('About to go to Editor'); return null; })()}
-      <Editor setPlainText={setPlainText} setEditorState={setEditorState} />
+      
+      <DOMComponent name="Europa" dom={{ matchContents: true }}/>
+
+      <Editor setPlainText={setPlainText} setEditorState={setEditorState} dom={{ matchContents: true}} />
+
+      {/* <Editor setPlainText={setPlainText} setEditorState={setEditorState} dom={{ style: { 
+      width: "100%", 
+      height: "100px", 
+      }, matchContents: true }} /> */}
     </>
   );
 } 
