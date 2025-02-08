@@ -2,15 +2,13 @@
 import React from 'react';
 
 interface DOMComponentProps {
-  name: string;
+  // name: string;
   dom: {
     matchContents: boolean;
   };
 }
 
-const DOMComponent: React.FC<DOMComponentProps> = ({ name, dom }) => {
+export default function DOMComponent({ dom }: DOMComponentProps) {
   // Component implementation
-  return <div>{name}</div>; // Example rendering
-};
-
-export default DOMComponent;
+  return <div>"Hello"</div>; // Example rendering
+}
